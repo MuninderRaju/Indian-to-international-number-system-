@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number System Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+Telugu:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans Telugu', sans-serif;
+        }
+        .converter-container {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        .panel {
+            padding: 2rem;
+        }
+        .input-box {
+            font-size: 2.25rem; /* h3 equivalent */
+            line-height: 2.5rem; /* h3 equivalent */
+            font-weight: 700;
+            color: black;
+            background-color: #e0f2fe; /* light blue */
+            border: 2px solid #38bdf8;
+            border-radius: 0.5rem;
+            text-align: center;
+            width: 100%;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+        .input-box:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4);
+            border-color: #2563eb;
+        }
+        .words-display {
+            background-color: #fee2e2; /* light red background */
+            color: #dc2626; /* red text */
+            font-size: 1.25rem; /* f3 equivalent, adjusted for readability */
+            line-height: 1.75rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            min-height: 100px;
+            word-wrap: break-word;
+        }
+        .telugu-text {
+            font-family: 'Noto Sans Telugu', sans-serif;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="converter-container bg-green-100 max-w-6xl w-full mx-auto">
+        <div class="grid md:grid-cols-2 gap-px bg-green-200">
+            <!-- Left Panel: Indian System -->
+            <div class="panel bg-green-50">
+                <h2 class="text-2xl font-bold text-center text-green-800 mb-4">
+                    Indian System of Numeration <br>
+                    <span class="telugu-text text-xl">(హిందూ సంఖ్యా మానం)</span>
+                </h2>
+                <input type="text" id="numberInput" class="input-box" placeholder="Enter number..." oninput="updateSystems()">
+                <div id="indianWords" class="words-display">
+                    <!-- Indian system words will appear here -->
+                </div>
+            </div>
+
+            <!-- Right Panel: International System -->
+            <div class="panel bg-green-50">
+                <h2 class="text-2xl font-bold text-center text-green-800 mb-4">
+                    International System of Numeration <br>
+                    <span class="telugu-text text-xl">(ఆంగ్ల సంఖ్యా మానం)</span>
+                </h2>
+                <div id="internationalOutput" class="input-box bg-blue-100 border-blue-300 flex items-center justify-center">
+                    <!-- International formatted number will appear here -->
+                </div>
+                <div id="internationalWords" class="words-display">
+                    <!-- International system words will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Creator Footer -->
+    <footer class="text-center mt-6">
+        <p class="text-base font-semibold text-blue-600">Created by</p>
+        <p class="text-lg font-bold text-violet-600">A MUNINDER RAJU GHS EIDGAON,NIRMAL</p>
+    </footer>
+
+
+    <script>
+        // --- English Conversion Logic ---
+        const english = {
+            units: ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"],
+            tens: ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"],
+        };
+
+        function toEnglishWords(num) {
+            let str = "";
+            if (num >= 100) {
+                str += english.units[Math.floor(num / 100)] + " Hundred ";
+                num %= 100;
+            }
+            if (num >= 20) {
+                str += english.tens[Math.floor(num / 10)] + " ";
+                num %= 10;
+            }
+            if (num > 0) {
+                str += english.units[num] + " ";
+            }
+            return str;
+        }
+
+        function numberToIndianWords_EN(numStr) {
+            if (!numStr || numStr === '0') return 'Zero';
+            let words = "";
+            if (numStr.length > 7) {
+                words += toEnglishWords(parseInt(numStr.slice(0, -7))) + "Crore ";
+                numStr = numStr.slice(-7);
+            }
+            if (numStr.length > 5) {
+                words += toEnglishWords(parseInt(numStr.slice(0, -5))) + "Lakh ";
+                numStr = numStr.slice(-5);
+            }
+            if (numStr.length > 3) {
+                words += toEnglishWords(parseInt(numStr.slice(0, -3))) + "Thousand ";
+                numStr = numStr.slice(-3);
+            }
+            words += toEnglishWords(parseInt(numStr));
+            return words.trim();
+        }
+
+        function numberToInternationalWords_EN(numStr) {
+            if (!numStr || numStr === '0') return 'Zero';
+            let words = "";
+            const chunks = [];
+            while (numStr.length > 0) {
+                chunks.unshift(numStr.slice(-3));
+                numStr = numStr.slice(0, -3);
+            }
+            const powers = ["", "Thousand", "Million", "Billion", "Trillion"];
+            chunks.forEach((chunk, i) => {
+                if (parseInt(chunk, 10) > 0) {
+                    words += toEnglishWords(parseInt(chunk, 10)) + powers[chunks.length - 1 - i] + " ";
+                }
+            });
+            return words.trim();
+        }
+
+        // --- Telugu Conversion Logic (FINAL FIX) ---
+        const toTeluguWords = (numStr) => {
+            const n = parseInt(numStr, 10);
+            if (isNaN(n) || n === 0) return "";
+            
+            const units = ["", "ఒకటి", "రెండు", "మూడు", "నాలుగు", "ఐదు", "ఆరు", "ఏడు", "ఎనిమిది", "తొమ్మిది", "పది", "పదకొండు", "పన్నెండు", "పదమూడు", "పద్నాలుగు", "పదిహేను", "పదహారు", "పదిహేడు", "పద్దెనిమిది", "పంతొమ్మిది"];
+            const tens = ["", "", "ఇరవై", "ముప్పై", "నలభై", "యాభై", "అరవై", "డెబ్బై", "ఎనభై", "తొంభై"];
+
+            if (n < 20) return units[n];
+            if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? " " + units[n % 10] : "");
+            if (n < 1000) {
+                const hundredPart = Math.floor(n / 100);
+                const rest = n % 100;
+                let str = "";
+                if (hundredPart === 1) {
+                    str = "ఒక వంద";
+                } else {
+                    str = units[hundredPart] + (rest > 0 ? " వందల" : " వందలు");
+                }
+                if (rest > 0) {
+                    str += " " + toTeluguWords(rest.toString());
+                }
+                return str;
+            }
+            return "";
+        };
+
+        function numberToIndianWords_TE(numStr) {
+            if (!numStr || numStr === '0') return 'సున్నా';
+            let n = parseInt(numStr, 10);
+            if (n < 1000) return toTeluguWords(n.toString());
+
+            let words = [];
+            if (n >= 10000000) {
+                const part = Math.floor(n / 10000000);
+                const remainder = n % 10000000;
+                const suffix = remainder === 0 ? "కోట్లు" : "కోట్ల";
+                words.push(part === 1 ? "ఒక కోటి" : numberToIndianWords_TE(part.toString()) + " " + suffix);
+                n = remainder;
+            }
+            if (n >= 100000) {
+                const part = Math.floor(n / 100000);
+                const remainder = n % 100000;
+                const suffix = remainder === 0 ? "లక్షలు" : "లక్షల";
+                words.push(part === 1 ? "ఒక లక్ష" : numberToIndianWords_TE(part.toString()) + " " + suffix);
+                n = remainder;
+            }
+            if (n >= 1000) {
+                const part = Math.floor(n / 1000);
+                const remainder = n % 1000;
+                const suffix = remainder === 0 ? "వేలు" : "వేల";
+                words.push(part === 1 ? "ఒక వెయ్యి" : toTeluguWords(part.toString()) + " " + suffix);
+                n = remainder;
+            }
+            if (n > 0) {
+                words.push(toTeluguWords(n.toString()));
+            }
+            return words.join(" ").trim();
+        }
+
+        function numberToInternationalWords_TE(numStr) {
+            if (!numStr || numStr === '0') return 'సున్నా';
+            let n = parseInt(numStr, 10);
+            if (n < 1000) return toTeluguWords(n.toString());
+
+            let words = [];
+            const powers = [
+                { val: 1000000000000, s: "ఒక ట్రిలియన్", p: "ట్రిలియన్లు", pl: "ట్రిలియన్ల" },
+                { val: 1000000000, s: "ఒక బిలియన్", p: "బిలియన్లు", pl: "బిలియన్ల" },
+                { val: 1000000, s: "ఒక మిలియన్", p: "మిలియన్లు", pl: "మిలియన్ల" },
+                { val: 1000, s: "ఒక వెయ్యి", p: "వేలు", pl: "వేల" }
+            ];
+
+            for (const power of powers) {
+                if (n >= power.val) {
+                    const part = Math.floor(n / power.val);
+                    const remainder = n % power.val;
+                    const suffix = remainder === 0 ? power.p : power.pl;
+                    words.push(part === 1 ? power.s : numberToInternationalWords_TE(part.toString()) + " " + suffix);
+                    n = remainder;
+                }
+            }
+            if (n > 0) {
+                words.push(toTeluguWords(n.toString()));
+            }
+            return words.join(" ").trim();
+        }
+
+        // --- Main Application Logic ---
+        function formatIndian(numStr) {
+            if (numStr.length <= 3) return numStr;
+            const lastThree = numStr.slice(-3);
+            const otherNumbers = numStr.slice(0, -3);
+            return otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + "," + lastThree;
+        }
+
+        function formatInternational(numStr) {
+            return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function updateSystems() {
+            const inputEl = document.getElementById('numberInput');
+            const indianWordsEl = document.getElementById('indianWords');
+            const internationalOutputEl = document.getElementById('internationalOutput');
+            const internationalWordsEl = document.getElementById('internationalWords');
+
+            let numStr = inputEl.value.replace(/\D/g, '').substring(0, 15);
+            inputEl.value = formatIndian(numStr);
+
+            if (numStr === "") {
+                indianWordsEl.innerHTML = "";
+                internationalOutputEl.innerHTML = "";
+                internationalWordsEl.innerHTML = "";
+                return;
+            }
+
+            // Update Indian System Words
+            const indianEng = numberToIndianWords_EN(numStr);
+            const indianTel = numberToIndianWords_TE(numStr);
+            indianWordsEl.innerHTML = `<p>${indianEng}</p><p class="telugu-text mt-2">${indianTel}</p>`;
+
+            // Update International System Output and Words
+            internationalOutputEl.innerText = formatInternational(numStr);
+            const internationalEng = numberToInternationalWords_EN(numStr);
+            const internationalTel = numberToInternationalWords_TE(numStr);
+            internationalWordsEl.innerHTML = `<p>${internationalEng}</p><p class="telugu-text mt-2">${internationalTel}</p>`;
+        }
+        
+        window.onload = updateSystems;
+    </script>
+</body>
+</html>
